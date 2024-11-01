@@ -35,6 +35,7 @@ export function ScheduleMoment({ onSchedule, desires, isHotMode, isEmmaMode }: P
   const [time, setTime] = useState('');
   const [category, setCategory] = useState<IntimateCategory>(INTIMATE_CATEGORIES[0]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const richardsDesires = desires.filter(d => d.author === 'Richard' && d.isHot === isHotMode);
 
@@ -54,8 +55,6 @@ export function ScheduleMoment({ onSchedule, desires, isHotMode, isEmmaMode }: P
           title,
           description,
           date: dateTime,
-          category: isHotMode ? category : undefined,
-          author: isEmmaMode ? 'Emma' : 'Richard',
         };
       } else {
         const selectedDesire = desires.find(d => d.id === parseInt(selectedDesireId));
@@ -65,8 +64,6 @@ export function ScheduleMoment({ onSchedule, desires, isHotMode, isEmmaMode }: P
           title: selectedDesire.title,
           description: selectedDesire.description,
           date: dateTime,
-          category: selectedDesire.category,
-          author: isEmmaMode ? 'Emma' : 'Richard',
           desireId: selectedDesire.id,
         };
       }
@@ -133,6 +130,7 @@ export function ScheduleMoment({ onSchedule, desires, isHotMode, isEmmaMode }: P
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
               disabled={isLoading}
               required
+              onFocus={() => setShowCalendar(true)}
             />
           </div>
 
@@ -301,6 +299,7 @@ export function ScheduleMoment({ onSchedule, desires, isHotMode, isEmmaMode }: P
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
             disabled={isLoading}
             required
+            onFocus={() => setShowCalendar(true)}
           />
         </div>
 
