@@ -1,4 +1,4 @@
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 
 interface EmailData {
   subject: string;
@@ -6,14 +6,14 @@ interface EmailData {
 }
 
 // Initialize EmailJS with your public key
-emailjs.init("YOUR_PUBLIC_KEY");
+emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
 
 export const emailService = {
   async sendEmail(data: EmailData): Promise<boolean> {
     try {
       const response = await emailjs.send(
-        "service_b53c3ts", // Service ID
-        "template_7k335rj", // Template ID
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         {
           to_email: 'richyhunter.rh@gmail.com',
           subject: data.subject,

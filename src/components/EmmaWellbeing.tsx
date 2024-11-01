@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, AlertCircle, HeartHandshake, Calendar } from 'lucide-react';
+import { AlertCircle, HeartHandshake, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { enGB } from 'date-fns/locale';
 import { ScheduleMoment } from './ScheduleMoment';
@@ -18,19 +18,20 @@ export function EmmaWellbeing({ onSchedule, desires, isHotMode, isEmmaMode }: Pr
   const [wellbeing, setWellbeing] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent, type: 'issues' | 'wellbeing') => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    const content = type === 'issues' ? weeklyIssues : wellbeing;
-    const title = type === 'issues' ? 'Weekly Challenges' : 'Current Wellbeing';
     
     const currentDate = format(new Date(), 'dd/MM/yyyy HH:mm', { locale: enGB });
     
     const emailBody = `
-${title}:
+Weekly Challenges:
 
-${content}
+${weeklyIssues}
+
+Current Wellbeing:
+
+${wellbeing}
 
 Sent on: ${currentDate}
     `.trim();
@@ -42,12 +43,9 @@ Sent on: ${currentDate}
       });
       
       if (success) {
-        if (type === 'issues') {
-          setWeeklyIssues('');
-        } else {
-          setWellbeing('');
-        }
-        toast.success(`${title} shared successfully!`);
+        setWeeklyIssues('');
+        setWellbeing('');
+        toast.success('Weekly update shared successfully!');
       } else {
         toast.error('Failed to share. Please try again.');
       }
@@ -77,10 +75,10 @@ Sent on: ${currentDate}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-purple-500" />
-          Weekly Challenges
+          Weekly Update
         </h2>
         
-        <form onSubmit={(e) => handleSubmit(e, 'issues')} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               What are your 3 biggest issues for the upcoming week and how would you like Richard to help?
@@ -96,25 +94,10 @@ Sent on: ${currentDate}
               required
             />
           </div>
-          <button
-            type="submit"
-            disabled={isSubmitting || !weeklyIssues.trim()}
-            className="w-full py-2 px-4 rounded-md text-white font-medium bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-colors disabled:opacity-50"
-          >
-            {isSubmitting ? 'Sharing...' : 'Share Weekly Challenges'}
-          </button>
-        </form>
-      </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <HeartHandshake className="w-5 h-5 text-purple-500" />
-          Current Wellbeing
-        </h2>
-        
-        <form onSubmit={(e) => handleSubmit(e, 'wellbeing')} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              <HeartHandshake className="w-4 h-4 inline-block mr-1" />
               How are you feeling in yourself so Richard can best support you?
             </label>
             <textarea
@@ -126,12 +109,13 @@ Sent on: ${currentDate}
               required
             />
           </div>
+
           <button
             type="submit"
-            disabled={isSubmitting || !wellbeing.trim()}
+            disabled={isSubmitting || !weeklyIssues.trim() || !wellbeing.trim()}
             className="w-full py-2 px-4 rounded-md text-white font-medium bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? 'Sharing...' : 'Share Current Wellbeing'}
+            {isSubmitting ? 'Sharing...' : 'Share Weekly Update'}
           </button>
         </form>
       </div>
