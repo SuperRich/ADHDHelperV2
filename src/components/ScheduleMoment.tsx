@@ -35,7 +35,7 @@ export function ScheduleMoment({ onSchedule, desires, isHotMode, isEmmaMode }: P
   const [time, setTime] = useState('');
   const [category, setCategory] = useState<IntimateCategory>(INTIMATE_CATEGORIES[0]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [, setShowCalendar] = useState(false);
 
   const richardsDesires = desires.filter(d => d.author === 'Richard' && d.isHot === isHotMode);
 

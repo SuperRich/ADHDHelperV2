@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@googleapis/calendar": "^9.7.9",
     "@tanstack/react-query": "^5.24.1",
+    "@types/gapi.calendar": "^3.0.11",
     "date-fns": "^3.3.1",
     "google-auth-library": "^9.14.2",
+    "googleapis": "^144.0.0",
     "idb": "^8.0.0",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",

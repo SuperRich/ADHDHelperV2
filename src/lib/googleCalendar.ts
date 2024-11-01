@@ -52,9 +52,9 @@ export async function getAuthToken(): Promise<string> {
     try {
       
       if (gapi.client.getToken() === null) {
-        tokenClient.requestAccessToken({ prompt: 'consent' });
+        tokenClient.requestAccessToken();
       } else {
-        tokenClient.requestAccessToken({ prompt: '' });
+        tokenClient.requestAccessToken();
       }
     } catch (err) {
       reject(err);

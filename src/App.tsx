@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Heart, Brain, Calendar, MessageCircleHeart, UserCircle2, Flame } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
