@@ -10,6 +10,7 @@ import DesiresList from './components/DesiresList';
 import { ModeToggle } from './components/ModeToggle';
 import { Login } from './components/Login';
 import { EmmaWellbeing } from './components/EmmaWellbeing';
+import { CalendarView } from './components/CalendarView';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -143,141 +144,151 @@ function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <MessageCircleHeart className="w-5 h-5 text-pink-500" />
-                Share an Appreciation
-              </h2>
-              
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (newAppreciation.trim()) {
-                    addAppreciation.mutate(newAppreciation);
-                  }
-                }}
-                className="space-y-4"
-              >
-                <textarea
-                  value={newAppreciation}
-                  onChange={(e) => setNewAppreciation(e.target.value)}
-                  placeholder={`Tell ${isEmmaMode ? 'Richard' : 'Emma'} what you appreciate...`}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                  rows={3}
-                />
-                <button
-                  type="submit"
-                  className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-                    isEmmaMode
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                      : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600'
-                  } transition-colors`}
-                >
-                  Share Appreciation
-                </button>
-              </form>
-            </div>
-
-            <div className="space-y-4">
-              {appreciations.map((appreciation) => (
-                <AppreciationCard
-                  key={appreciation.id}
-                  appreciation={appreciation}
-                  onDelete={deleteAppreciation.mutate}
-                  currentUser={isEmmaMode ? 'Emma' : 'Richard'}
-                />
-              ))}
-            </div>
+        <div className="grid grid-cols-1 gap-8">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-pink-500" />
+              Calendar
+            </h2>
+            <CalendarView />
           </div>
 
-          <div className="space-y-6">
-            {isEmmaMode ? (
-              <>
-                {!isHotMode ? (
-                  <EmmaWellbeing
-                    onSchedule={addScheduledMoment.mutate}
-                    desires={filteredDesires}
-                    isHotMode={isHotMode}
-                    isEmmaMode={isEmmaMode}
-                  />
-                ) : (
-                  <>
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-pink-500" />
-                        Schedule a Moment
-                      </h2>
-                      
-                      <ScheduleMoment
-                        onSchedule={addScheduledMoment.mutate}
-                        desires={filteredDesires}
-                        isHotMode={isHotMode}
-                        isEmmaMode={isEmmaMode}
-                      />
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <UserCircle2 className="w-5 h-5 text-pink-500" />
-                        Richard's Desires
-                      </h2>
-                      
-                      <DesiresList
-                        desires={filteredDesires}
-                        isEmmaMode={true}
-                        onDelete={deleteDesire.mutate}
-                        isHotMode={isHotMode}
-                      />
-                    </div>
-                  </>
-                )}
-              </>
-            ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-pink-500" />
-                  Share Your Desires
+                  <MessageCircleHeart className="w-5 h-5 text-pink-500" />
+                  Share an Appreciation
                 </h2>
                 
-                <DesiresList
-                  desires={filteredDesires}
-                  isEmmaMode={false}
-                  onDelete={deleteDesire.mutate}
-                  onAdd={addDesire.mutate}
-                  isHotMode={isHotMode}
-                />
-              </div>
-            )}
-
-            <div className="space-y-4">
-              {scheduledMoments.map((moment) => (
-                <div
-                  key={moment.id}
-                  className="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg"
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (newAppreciation.trim()) {
+                      addAppreciation.mutate(newAppreciation);
+                    }
+                  }}
+                  className="space-y-4"
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        {moment.title}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {format(new Date(moment.date), 'MMM d, yyyy h:mm a')}
-                      </p>
-                    </div>
-                    {isEmmaMode && (
-                      <button
-                        onClick={() => moment.id && deleteScheduledMoment.mutate(moment.id)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        <Calendar className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-                  <p className="mt-2 text-gray-700">{moment.description}</p>
+                  <textarea
+                    value={newAppreciation}
+                    onChange={(e) => setNewAppreciation(e.target.value)}
+                    placeholder={`Tell ${isEmmaMode ? 'Richard' : 'Emma'} what you appreciate...`}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                    rows={3}
+                  />
+                  <button
+                    type="submit"
+                    className={`w-full py-2 px-4 rounded-md text-white font-medium ${
+                      isEmmaMode
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                        : 'bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600'
+                    } transition-colors`}
+                  >
+                    Share Appreciation
+                  </button>
+                </form>
+              </div>
+
+              <div className="space-y-4">
+                {appreciations.map((appreciation) => (
+                  <AppreciationCard
+                    key={appreciation.id}
+                    appreciation={appreciation}
+                    onDelete={deleteAppreciation.mutate}
+                    currentUser={isEmmaMode ? 'Emma' : 'Richard'}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              {isEmmaMode ? (
+                <>
+                  {!isHotMode ? (
+                    <EmmaWellbeing
+                      onSchedule={addScheduledMoment.mutate}
+                      desires={filteredDesires}
+                      isHotMode={isHotMode}
+                      isEmmaMode={isEmmaMode}
+                    />
+                  ) : (
+                    <>
+                      <div className="bg-white rounded-lg shadow-md p-6">
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                          <Calendar className="w-5 h-5 text-pink-500" />
+                          Schedule a Moment
+                        </h2>
+                        
+                        <ScheduleMoment
+                          onSchedule={addScheduledMoment.mutate}
+                          desires={filteredDesires}
+                          isHotMode={isHotMode}
+                          isEmmaMode={isEmmaMode}
+                        />
+                      </div>
+
+                      <div className="bg-white rounded-lg shadow-md p-6">
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                          <UserCircle2 className="w-5 h-5 text-pink-500" />
+                          Richard's Desires
+                        </h2>
+                        
+                        <DesiresList
+                          desires={filteredDesires}
+                          isEmmaMode={true}
+                          onDelete={deleteDesire.mutate}
+                          isHotMode={isHotMode}
+                        />
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-pink-500" />
+                    Share Your Desires
+                  </h2>
+                  
+                  <DesiresList
+                    desires={filteredDesires}
+                    isEmmaMode={false}
+                    onDelete={deleteDesire.mutate}
+                    onAdd={addDesire.mutate}
+                    isHotMode={isHotMode}
+                  />
                 </div>
-              ))}
+              )}
+
+              <div className="space-y-4">
+                {scheduledMoments.map((moment) => (
+                  <div
+                    key={moment.id}
+                    className="bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          {moment.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {format(new Date(moment.date), 'MMM d, yyyy h:mm a')}
+                        </p>
+                      </div>
+                      {isEmmaMode && (
+                        <button
+                          onClick={() => moment.id && deleteScheduledMoment.mutate(moment.id)}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <Calendar className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="mt-2 text-gray-700">{moment.description}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -17,10 +17,13 @@ export class GoogleAuthService {
     return new Promise<void>((resolve) => {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
       script.onload = () => {
         this.tokenClient = google.accounts.oauth2.initTokenClient({
           client_id: GoogleAuthService.CLIENT_ID,
           scope: GoogleAuthService.SCOPES.join(' '),
+          prompt: 'consent',
           callback: (response: any) => {
             if (response.error !== undefined) {
               throw new Error(response.error);
@@ -40,33 +43,42 @@ export class GoogleAuthService {
       await this.initialize();
     }
 
-    try {
-      await new Promise<void>((resolve, reject) => {
+    // If we already have a token, return it
+    if (this.accessToken) {
+      return this.accessToken;
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      try {
         if (!this.tokenClient) {
           reject(new Error('Token client not initialized'));
           return;
         }
 
+        // Set up the callback before requesting the token
         this.tokenClient.callback = (response: any) => {
           if (response.error !== undefined) {
             reject(new Error(response.error));
+            return;
           }
           this.accessToken = response.access_token;
-          resolve();
+          resolve(response.access_token);
         };
 
-        this.tokenClient.requestAccessToken();
-      });
-
-      if (!this.accessToken) {
-        throw new Error('Failed to get access token');
+        // Request the token
+        if (gapi.client?.getToken()?.access_token) {
+          // We have a token already, resolve with it
+          resolve(gapi.client.getToken().access_token);
+        } else {
+          // No token, request a new one
+          this.tokenClient.requestAccessToken({
+            prompt: 'consent'
+          });
+        }
+      } catch (error) {
+        reject(error);
       }
-
-      return this.accessToken;
-    } catch (err) {
-      console.error('Sign-in error:', err);
-      throw err;
-    }
+    });
   }
 
   async signOut() {

@@ -84,6 +84,56 @@ export class GoogleCalendarService {
       throw error;
     }
   }
+
+  async getMonthEvents(start: Date, end: Date): Promise<CalendarEvent[]> {
+    const events = await this.listEvents(start, end);
+    return events.map((event: GoogleCalendarEvent) => ({
+      id: event.id || '',
+      summary: event.summary || '',
+      start: event.start?.dateTime || event.start?.date || '',
+      end: event.end?.dateTime || event.end?.date || '',
+      description: event.description,
+      location: event.location
+    }));
+  }
+
+  async createEvent(event: Partial<CalendarEvent>): Promise<CalendarEvent> {
+    try {
+      const accessToken = await googleAuthService.signIn();
+      
+      const response = await fetch(
+        `${GoogleCalendarService.CALENDAR_API_BASE}/calendars/${encodeURIComponent(GoogleCalendarService.CALENDAR_ID)}/events`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            summary: event.summary,
+            description: event.description,
+            start: {
+              dateTime: event.start,
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
+            end: {
+              dateTime: event.end,
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to create event');
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Error creating event:', error);
+      throw error;
+    }
+  }
 }
 
 export const googleCalendarService = new GoogleCalendarService();
