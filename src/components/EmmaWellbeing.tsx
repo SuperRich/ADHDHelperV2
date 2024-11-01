@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertCircle, HeartHandshake, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { enGB } from 'date-fns/locale';
 import { ScheduleMoment } from './ScheduleMoment';
 import { emailService } from '../services/emailService';
 import { toast } from 'sonner';
+import { googleCalendarService } from '../services/googleCalendarService';
+import type { ScheduledMoment } from '../lib/db';  // Import the type from your db file
 
 interface Props {
-  onSchedule: (moment: any) => void;
+  onSchedule: (moment: Omit<ScheduledMoment, "id">) => void;
   desires: any[];
   isHotMode: boolean;
   isEmmaMode: boolean;
@@ -17,6 +19,37 @@ export function EmmaWellbeing({ onSchedule, desires, isHotMode, isEmmaMode }: Pr
   const [weeklyIssues, setWeeklyIssues] = useState('');
   const [wellbeing, setWellbeing] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendarEvents, setCalendarEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadCalendarEvents();
+  }, []);
+
+  const loadCalendarEvents = async () => {
+    try {
+      const events = await googleCalendarService.getUpcomingEvents();
+      setCalendarEvents(events || []); // Provide empty array fallback if events is undefined
+    } catch (error) {
+      console.error('Error loading calendar events:', error);
+    }
+  };
+
+  const handleAddToCalendar = async (activity: string) => {
+    const startTime = new Date();
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
+
+    try {
+      await googleCalendarService.addWellbeingEvent(
+        `Wellbeing Activity: ${activity}`,
+        startTime,
+        endTime,
+        `Scheduled wellbeing activity: ${activity}`
+      );
+      await loadCalendarEvents();
+    } catch (error) {
+      console.error('Error adding event to calendar:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +98,12 @@ Sent on: ${currentDate}
         </h2>
         
         <ScheduleMoment
-          onSchedule={onSchedule}
+          onSchedule={(moment: Omit<ScheduledMoment, "id">) => {
+            onSchedule(moment);
+            if (moment.title) {
+              handleAddToCalendar(moment.title);
+            }
+          }}
           desires={desires}
           isHotMode={isHotMode}
           isEmmaMode={isEmmaMode}
@@ -118,6 +156,26 @@ Sent on: ${currentDate}
             {isSubmitting ? 'Sharing...' : 'Share Weekly Update'}
           </button>
         </form>
+      </div>
+
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold mb-3">Upcoming Activities</h3>
+        <div className="space-y-2">
+          {calendarEvents.map((event: any) => (
+            <div key={event.id} className="p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+              <p className="font-medium text-gray-800">{event.summary}</p>
+              <p className="text-sm text-gray-600">
+                {new Date(event.start.dateTime).toLocaleString()}
+              </p>
+              {event.description && (
+                <p className="text-sm text-gray-500 mt-1">{event.description}</p>
+              )}
+            </div>
+          ))}
+          {calendarEvents.length === 0 && (
+            <p className="text-gray-500 text-center py-4">No upcoming activities</p>
+          )}
+        </div>
       </div>
     </div>
   );
