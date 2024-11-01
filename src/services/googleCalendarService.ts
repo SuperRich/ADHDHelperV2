@@ -13,11 +13,7 @@ class GoogleCalendarService {
   private tokenClient: google.accounts.oauth2.TokenClient | null = null;
 
   constructor() {
-    console.log('Environment vars:', {
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      allEnv: import.meta.env
-    });
+   
 
     // Load the Google API script
     const script = document.createElement('script');
@@ -38,11 +34,6 @@ class GoogleCalendarService {
     try {
       await new Promise((resolve, reject) => {
         gapi.load('client', { callback: resolve, onerror: reject });
-      });
-
-      console.log('Environment vars:', {
-        apiKey: API_KEY,
-        clientId: CLIENT_ID
       });
       
       await gapi.client.init({
